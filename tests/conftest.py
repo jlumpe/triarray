@@ -50,3 +50,22 @@ def index_matrix(n, indices, upper):
 	assert np.array_equal(matrix, matrix.T)
 
 	return matrix
+
+
+@pytest.fixture()
+def rand_matrix(n, indices):
+	"""Random symmetric matrix with zero diagonal."""
+
+	dtype = indices.dtype
+	random = np.random.RandomState(0)
+
+	if dtype.kind in 'iu':
+		matrix = random.randint(100, size=(n, n)).astype(dtype=dtype)
+	else:
+		matrix = random.rand(n, n).astype(dtype=dtype)
+
+	matrix += matrix.T.copy()
+
+	np.fill_diagonal(matrix, 0)
+
+	return matrix
