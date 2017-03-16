@@ -35,7 +35,7 @@ def tri_root_rem(t):
 
 	:param int t: Nonnegative integer
 	:returns: (n, r) tuple.
-	:rtype tuple:
+	:rtype: tuple
 	"""
 	s = 8 * t + 1
 	rs = int(round(np.sqrt(s)))
