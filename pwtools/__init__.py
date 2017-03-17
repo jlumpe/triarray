@@ -1,6 +1,6 @@
 """Utilities for dealing with pairwise distance/similarity matrices."""
 
-from .math import tri_n, tri_root, tri_root_rem
+from .math import tri_n, tri_root, tri_root_strict, tri_root_trunc, tri_root_rem
 from .convert import (
 	mat_idx_to_triu,
 	mat_idx_to_tril,
