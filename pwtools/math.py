@@ -4,9 +4,11 @@ import numpy as np
 import numba as nb
 
 
-@nb.vectorize(nopython=True)
+@nb.vectorize([nb.intp(nb.intp)], nopython=True)
 def tri_n(n):
-	"""Get the nth triangular number (numpy ufunc).
+	"""tri_n(n)
+
+	Get the nth triangular number (numpy ufunc).
 
 	:param int n: Nonnegative integer.
 	:rtype: int
@@ -14,9 +16,11 @@ def tri_n(n):
 	return n * (n + 1) // 2
 
 
-@nb.vectorize(nopython=True)
+@nb.vectorize([nb.intp(nb.intp)], nopython=True)
 def tri_root(t):
-	"""Get n such that t is the nth triangular number (numpy ufunc).
+	"""tri_root(t)
+
+	Get n such that t is the nth triangular number (numpy ufunc).
 
 	:param int t: Triangular number.
 	:rtype: int
