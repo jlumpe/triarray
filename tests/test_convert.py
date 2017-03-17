@@ -86,3 +86,17 @@ def test_index_conversion_array(n, upper):
 
 	assert np.array_equal(calc_rows, rows)
 	assert np.array_equal(calc_cols, cols)
+
+
+def test_squareform_conversion(n):
+	"""Test vs. scipy's squareform() function."""
+
+	try:
+		from scipy.spatial.distance import squareform
+	except ImportError:
+		pytest.skip('Could not import scipy')
+
+	indices = np.arange(pw.tri_n(n - 1), dtype=np.double)
+	matrix = squareform(indices)
+
+	assert np.array_equal(pw.tri_to_matrix(indices, upper=True), matrix)
