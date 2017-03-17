@@ -7,41 +7,17 @@ import numba as nb
 from .math import tri_n, tri_root, tri_root_rem
 
 
-@nb.vectorize(nopython=True)
-def nb_mat_idx_to_triu(row, col, n):
-	"""Numba implementation of :func:`.mat_idx_to_triu` (numpy ufunc).
+@nb.vectorize([nb.intp(nb.intp, nb.intp, nb.intp)], nopython=True)
+def mat_idx_to_tril_fast(row, col, n):
+	"""mat_idx_to_tril_fast(row, col, n)
 
-	row must be < col.
+	Convert two-dimensional index to linear index of lower triangle.
 
-	:param int row: Matrix row index.
-	:param int col: Matrix column index.
-	:param int n: Matrix size.
-	:returns: Linear index of position in upper triangle.
-	:rtype int:
-	"""
-	# The following methods utilizes the symmetry between the upper and lower
-	# indexing methods - if
-	#     (row, col) <-- triu --> (i)
-	# then 
-	#     (n - row - 1, n - col - 1) <-- tril --> (T_{n-1} - i - 1)
-	# i.e., if you switch which triangle you're on and reverse all indices
-	# between their highest and lowest value the relationship still holds.
-	# 
-	# return tri_n(n - 1) - nb_mat_idx_to_tril(n - row - 1, n - col - 1, n) - 1
-	# return tri_n(n - 1) - tri_n(n - row - 2) - (n - col - 1) - 1
-	# return tri_n(n - 1) - tri_n(n - row - 2) - n + col
-	# return tri_n(n - 1) - tri_n(n - row - 2) - (n - 1) + col - 1
-	return tri_n(n - 2) - tri_n(n - row - 2) + col - 1
-
-
-@nb.vectorize(nopython=True)
-def nb_mat_idx_to_tril(row, col, n):
-	"""Numba implementation of :func:`.mat_idx_to_tril` (numpy ufunc).
-
-	row must be > col.
+	This is the fast implementation, which does not check the order of row and
+	col.
 
 	:param int row: Matrix row index.
-	:param int col: Matrix column index.
+	:param int col: Matrix column index. Must be less than row.
 	:param int n: Matrix size.
 	:returns: Linear index of position in lower triangle.
 	:rtype int:
@@ -49,70 +25,82 @@ def nb_mat_idx_to_tril(row, col, n):
 	return tri_n(row - 1) + col
 
 
-def _ensure_order(indices1, indices2):
-	"""
-	Ensure that all elements of the first index array are smaller than the
-	corresponding elements in the second.
-
-	Used by mat_idx_to_triu and mat_idx_to_tril to ensure row and column
-	indices are in the correct order.
-
-	:param indices1: Scalar or array of integer indices.
-	:param indices2: Scalar or array of integer indices in the same shape as
-		indices2.
-	:returns: Two-tuple of arrays where all elements in the first are smaller
-		than elements of the second.
-	:raises ValueError: If any array elements are equal.
-	"""
-
-	swapped = indices1 >= indices2
-	if np.any(swapped):
-		if np.any(indices1 == indices2):
-			raise ValueError("Can't get index along diagonal")
-
-		temp = indices2
-		indices2 = np.where(swapped, indices1, indices2)
-		indices1 = np.where(swapped, temp, indices1)
-
-	return indices1, indices2
-
-
-def mat_idx_to_triu(row, col, n):
-	"""Convert two-dimensional index to linear index of upper triangle.
-
-	If col < row (lower triangle), they will be swapped.
-
-	Function is vectorized, all arguments may be arrays.
-
-	:param int row: Row index in matrix.
-	:param int col: Column index in matrix.
-	:param int n: Size of matrix.
-	:rtype int:
-	:raises ValueError: If row and column are equal (does not correspond to an
-		element in the upper triangle).
-	"""
-
-	row, col = _ensure_order(row, col)
-	return nb_mat_idx_to_triu(row, col, n)
-
-
+@nb.vectorize([nb.intp(nb.intp, nb.intp, nb.intp)], nopython=True)
 def mat_idx_to_tril(row, col, n):
-	"""Convert two-dimensional index to linear index of lower triangle.
+	"""mat_idx_to_tril(row, col, n)
 
-	If col > row (upper triangle), they will be swapped.
+	Convert two-dimensional index to linear index of lower triangle.
 
-	Function is vectorized, all arguments may be arrays.
+	This is the safe implementation, which checks row and col are not equal and
+	swaps them if they are not in the correct order.
 
-	:param int row: Row index in matrix.
-	:param int col: Column index in matrix.
-	:param int n: Size of matrix.
+	:param int row: Matrix row index.
+	:param int col: Matrix column index. Must not be equal to row.
+	:param int n: Matrix size.
+	:returns: Linear index of position in lower triangle.
 	:rtype int:
-	:raises ValueError: If row and column are equal (does not correspond to an
-		element in the lower triangle).
 	"""
+	if col == row:
+		raise ValueError('Cannot get index along diagonal')
 
-	col, row = _ensure_order(col, row)
-	return nb_mat_idx_to_tril(row, col, n)
+	if row > col:
+		return mat_idx_to_tril_fast(row, col, n)
+	else:
+		return mat_idx_to_tril_fast(col, row, n)
+
+
+@nb.vectorize([nb.intp(nb.intp, nb.intp, nb.intp)], nopython=True)
+def mat_idx_to_triu_fast(row, col, n):
+	"""mat_idx_to_triu_fast(row, col, n)
+
+	Convert two-dimensional index to linear index of upper triangle.
+
+	This is the fast implementation, which does not check the order of row and
+	col.
+
+	:param int row: Matrix row index.
+	:param int col: Matrix column index. Must be greater than row.
+	:param int n: Matrix size.
+	:returns: Linear index of position in upper triangle.
+	:rtype int:
+	"""
+	# The following methods utilizes the symmetry between the upper and lower
+	# indexing methods - if
+	#     (row, col) <-- triu --> (i)
+	# then
+	#     (n - row - 1, n - col - 1) <-- tril --> (T_{n-1} - i - 1)
+	# i.e., if you switch which triangle you're on and reverse all indices
+	# between their highest and lowest value the relationship still holds.
+	#
+	# return tri_n(n - 1) - nb_mat_idx_to_tril(n - row - 1, n - col - 1, n) - 1
+	# return tri_n(n - 1) - tri_n(n - row - 2) - (n - col - 1) - 1
+	# return tri_n(n - 1) - tri_n(n - row - 2) - n + col
+	# return tri_n(n - 1) - tri_n(n - row - 2) - (n - 1) + col - 1
+	return tri_n(n - 2) - tri_n(n - row - 2) + col - 1
+
+
+@nb.vectorize([nb.intp(nb.intp, nb.intp, nb.intp)], nopython=True)
+def mat_idx_to_triu(row, col, n):
+	"""mat_idx_to_triu(row, col, n)
+
+	Convert two-dimensional index to linear index of upper triangle.
+
+	This is the safe implementation, which checks row and col are not equal and
+	swaps them if they are not in the correct order.
+
+	:param int row: Matrix row index.
+	:param int col: Matrix column index. Must not be equal to row.
+	:param int n: Matrix size.
+	:returns: Linear index of position in upper triangle.
+	:rtype int:
+	"""
+	if col == row:
+		raise ValueError('Cannot get index along diagonal')
+
+	if row < col:
+		return mat_idx_to_triu_fast(row, col, n)
+	else:
+		return mat_idx_to_triu_fast(col, row, n)
 
 
 @nb.jit(nopython=True)
@@ -143,26 +131,8 @@ def tril_idx_to_mat(i, n):
 
 
 @nb.jit(nopython=True)
-def nb_matrix_to_triu(matrix, out):
-	"""Numba implementation of matrix_to_tri() for ``upper=True.``
-
-	:param matrix: Square array.
-	:type matrix: numpy.ndarray.
-	:param out: Linear array of correct length to write values to.
-	:type matrix: numpy.ndarray
-	"""
-	N = matrix.shape[0]
-
-	i = 0
-	for row in range(N):
-		for col in range(row + 1, N):
-			out[i] = matrix[row, col]
-			i += 1
-
-
-@nb.jit(nopython=True)
-def nb_matrix_to_tril(matrix, out):
-	"""Numba implementation of matrix_to_tri() for ``upper=False.``
+def matrix_to_tril(matrix, out):
+	"""Get flattened lower triangle of a square matrix.
 
 	:param matrix: Square array.
 	:type matrix: numpy.ndarray.
@@ -174,6 +144,24 @@ def nb_matrix_to_tril(matrix, out):
 	i = 0
 	for row in range(N):
 		for col in range(row):
+			out[i] = matrix[row, col]
+			i += 1
+
+
+@nb.jit(nopython=True)
+def matrix_to_triu(matrix, out):
+	"""Get flattened upper triangle of a square matrix.
+
+	:param matrix: Square array.
+	:type matrix: numpy.ndarray.
+	:param out: Linear array of correct length to write values to.
+	:type matrix: numpy.ndarray
+	"""
+	N = matrix.shape[0]
+
+	i = 0
+	for row in range(N):
+		for col in range(row + 1, N):
 			out[i] = matrix[row, col]
 			i += 1
 
@@ -208,35 +196,55 @@ def matrix_to_tri(matrix, out=None, upper=False):
 		raise ValueError('"out" has incorrect shape')
 
 	if upper:
-		nb_matrix_to_triu(matrix, out)
+		matrix_to_triu(matrix, out)
 	else:
-		nb_matrix_to_tril(matrix, out)
+		matrix_to_tril(matrix, out)
 
 	return out
 
 
 @nb.jit(nopython=True)
-def nb_triu_to_matrix(array, diag, out):
-	"""Numba implementation of tri_to_matrix() for upper=True."""
-	N = tri_root(len(array)) + 1
+def tril_to_matrix(array, diag, out):
+	"""Convert flattened lower triangle to full symmetrical square matrix.
 
-	i = 0
-	for row in range(N):
-		out[row, row] = diag
-		for col in range(row + 1, N):
-			out[row, col] = out[col, row] = array[i]
-			i += 1
+	:param array: 1D array containing elements of matrix's lower triangle, in
+		same format as output of :func:`.matrix_to_tril`.
+	:type array: numpy.ndarray
+	:param diag: Number to fill diagonal with.
+	:param out: Existing array to write to. Must be square with the	correct
+		number of elements.
+	:type out: numpy.ndarray
+	"""
 
-
-@nb.jit(nopython=True)
-def nb_tril_to_matrix(array, diag, out):
-	"""Numba implementation of tri_to_matrix() for upper=False."""
 	N = tri_root(len(array)) + 1
 
 	i = 0
 	for row in range(N):
 		out[row, row] = diag
 		for col in range(row):
+			out[row, col] = out[col, row] = array[i]
+			i += 1
+
+
+@nb.jit(nopython=True)
+def triu_to_matrix(array, diag, out):
+	"""Convert flattened upper triangle to full symmetrical square matrix.
+
+	:param array: 1D array containing elements of matrix's upper triangle, in
+		same format as output of :func:`.matrix_to_triu`.
+	:type array: numpy.ndarray
+	:param diag: Number to fill diagonal with.
+	:param out: Existing array to write to. Must be square with the	correct
+		number of elements.
+	:type out: numpy.ndarray
+	"""
+
+	N = tri_root(len(array)) + 1
+
+	i = 0
+	for row in range(N):
+		out[row, row] = diag
+		for col in range(row + 1, N):
 			out[row, col] = out[col, row] = array[i]
 			i += 1
 
@@ -265,8 +273,8 @@ def tri_to_matrix(array, diag=0, out=None, upper=False):
 		raise ValueError('"out" has incorrect shape')
 
 	if upper:
-		nb_triu_to_matrix(array, diag, out)
+		triu_to_matrix(array, diag, out)
 	else:
-		nb_tril_to_matrix(array, diag, out)
+		tril_to_matrix(array, diag, out)
 
 	return out
