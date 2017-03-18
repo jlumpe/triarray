@@ -64,19 +64,8 @@ def mat_idx_to_triu_fast(row, col, n):
 	:returns: Linear index of position in upper triangle.
 	:rtype int:
 	"""
-	# The following methods utilizes the symmetry between the upper and lower
-	# indexing methods - if
-	#     (row, col) <-- triu --> (i)
-	# then
-	#     (n - row - 1, n - col - 1) <-- tril --> (T_{n-1} - i - 1)
-	# i.e., if you switch which triangle you're on and reverse all indices
-	# between their highest and lowest value the relationship still holds.
-	#
-	# return tri_n(n - 1) - nb_mat_idx_to_tril(n - row - 1, n - col - 1, n) - 1
-	# return tri_n(n - 1) - tri_n(n - row - 2) - (n - col - 1) - 1
-	# return tri_n(n - 1) - tri_n(n - row - 2) - n + col
-	# return tri_n(n - 1) - tri_n(n - row - 2) - (n - 1) + col - 1
-	return tri_n(n - 2) - tri_n(n - row - 2) + col - 1
+	# Messy but fast implementation
+	return (2 * n - row - 3) * row // 2 + col - 1
 
 
 @nb.vectorize([nb.intp(nb.intp, nb.intp, nb.intp)], nopython=True)
