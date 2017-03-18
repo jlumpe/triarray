@@ -1,9 +1,9 @@
-"""Test pwtools.matrix."""
+"""Test triarray.matrix."""
 
 import numpy as np
 import pytest
 
-import pwtools as pw
+import triarray as tri
 
 
 def check_getitem_same(mat1, mat2, index):
@@ -14,7 +14,7 @@ def check_getitem_same(mat1, mat2, index):
 @pytest.fixture()
 def trimatrix(indices, upper, diag_val):
 	"""TriMatrix that should correspond to the index_matrix fixture."""
-	return pw.TriMatrix(indices, upper=upper, diag_val=diag_val)
+	return tri.TriMatrix(indices, upper=upper, diag_val=diag_val)
 
 
 def test_attrs(n, indices, trimatrix, upper, diag_val):
@@ -32,7 +32,7 @@ def test_attrs(n, indices, trimatrix, upper, diag_val):
 def test_invalid_array_size():
 	"""Test constructor with invalid array size."""
 	with pytest.raises(ValueError):
-		pw.TriMatrix(np.arange(11))
+		tri.TriMatrix(np.arange(11))
 
 
 def test_index_conversion(trimatrix, index_matrix):

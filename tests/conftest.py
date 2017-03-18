@@ -4,7 +4,7 @@
 import pytest
 import numpy as np
 
-import pwtools as pw
+import triarray as tri
 
 
 @pytest.fixture(params=[10, 30, 100])
@@ -28,7 +28,7 @@ def dtype(request):
 @pytest.fixture()
 def indices(n, dtype):
 	"""Indices of each element in upper/lower triangle of test matrix."""
-	size = pw.tri_n(n - 1)
+	size = tri.tri_n(n - 1)
 	return np.arange(size, dtype=dtype)
 
 

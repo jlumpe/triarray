@@ -1,2 +1,3 @@
-# pwtools
-Python package for working with pairwise distance/similarity matrices in non-redundant format.
+# triarray
+
+Python package for working with symmetric matrices in non-redundant format.

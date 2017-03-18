@@ -1,11 +1,11 @@
-"""Test pwtools.io."""
+"""Test triarray.io."""
 
 import io
 
 import pytest
 import numpy as np
 
-import pwtools as pw
+import triarray as tri
 
 
 @pytest.fixture(params=[False, True])
@@ -20,7 +20,7 @@ def fobj(request, tmpdir, rand_matrix, upper):
 	else:
 		fobj = io.BytesIO()
 
-	pw.write_tri_file(fobj, rand_matrix, upper=upper)
+	tri.write_tri_file(fobj, rand_matrix, upper=upper)
 	fobj.seek(0)
 
 	yield fobj
@@ -71,7 +71,7 @@ def test_read_rows(rand_matrix, fobj, upper):
 	n = rand_matrix.shape[0]
 	dtype = rand_matrix.dtype
 
-	row_iter = pw.read_tri_file_rows(fobj, n, dtype=dtype, upper=upper)
+	row_iter = tri.read_tri_file_rows(fobj, n, dtype=dtype, upper=upper)
 
 	check_rows(row_iter, rand_matrix, upper)
 
@@ -83,7 +83,7 @@ def test_read_rows_subset(rand_matrix, fobj, upper, keep):
 
 	matrix_subset = rand_matrix[np.ix_(keep, keep)]
 
-	row_iter = pw.read_tri_file_rows(fobj, keep=keep, dtype=rand_matrix.dtype,
+	row_iter = tri.read_tri_file_rows(fobj, keep=keep, dtype=rand_matrix.dtype,
 	                                 upper=upper)
 
 	check_rows(row_iter, matrix_subset, upper)
@@ -96,7 +96,7 @@ def test_read_matrix(rand_matrix, fobj, upper, diag):
 	n = rand_matrix.shape[0]
 	dtype = rand_matrix.dtype
 
-	read = pw.read_tri_file(fobj, n=n, dtype=dtype, upper=upper, diag=diag)
+	read = tri.read_tri_file(fobj, n=n, dtype=dtype, upper=upper, diag=diag)
 
 	# Check diagonal first
 	assert np.all(np.diag(read) == (0 if diag is None else diag))
@@ -117,7 +117,7 @@ def test_read_matrix_subset(rand_matrix, fobj, upper, keep, diag):
 
 	matrix_subset = rand_matrix[np.ix_(keep, keep)]
 
-	read = pw.read_tri_file(fobj, keep=keep, dtype=dtype, upper=upper, diag=diag)
+	read = tri.read_tri_file(fobj, keep=keep, dtype=dtype, upper=upper, diag=diag)
 
 	# Check diagonal first
 	assert np.all(np.diag(read) == (0 if diag is None else diag))
@@ -141,10 +141,10 @@ def test_write_dtype(rand_matrix, upper, new_dtype):
 	
 	with io.BytesIO() as fobj:
 
-		pw.write_tri_file(fobj, rand_matrix, upper=upper, dtype=new_dtype)
+		tri.write_tri_file(fobj, rand_matrix, upper=upper, dtype=new_dtype)
 
 		fobj.seek(0)
-		read = pw.read_tri_file(fobj, n, dtype=new_dtype, upper=upper)
+		read = tri.read_tri_file(fobj, n, dtype=new_dtype, upper=upper)
 
 		assert read.dtype == new_dtype
 

@@ -1,17 +1,17 @@
-"""Test pwtools.index."""
+"""Test triarray.index."""
 
 import pytest
 import numpy as np
 
-import pwtools as pw
+import triarray as tri
 
 
 def test_convert_scalar(n, index_matrix, upper):
 	"""Test conversion between matrix and flattened triangle scalar indices."""
 
-	mat_to_tri = pw.mat_idx_to_triu if upper else pw.mat_idx_to_tril
-	mat_to_tri_fast = pw.mat_idx_to_triu_fast if upper else pw.mat_idx_to_tril_fast
-	tri_to_mat = pw.triu_idx_to_mat if upper else pw.tril_idx_to_mat
+	mat_to_tri = tri.mat_idx_to_triu if upper else tri.mat_idx_to_tril
+	mat_to_tri_fast = tri.mat_idx_to_triu_fast if upper else tri.mat_idx_to_tril_fast
+	tri_to_mat = tri.triu_idx_to_mat if upper else tri.tril_idx_to_mat
 
 	for row in range(n):
 
@@ -41,21 +41,21 @@ def test_convert_scalar(n, index_matrix, upper):
 def test_convert_array(n, upper):
 	"""Test conversion between matrix and flattened triangle array indices."""
 
-	indices = np.arange(pw.tri_n(n - 1))
+	indices = np.arange(tri.tri_n(n - 1))
 
 	if upper:
 		rows, cols = np.triu_indices(n, k=1)
 
-		calc_indices = pw.mat_idx_to_triu(rows, cols, n)
+		calc_indices = tri.mat_idx_to_triu(rows, cols, n)
 
-		calc_rows, calc_cols = pw.triu_idx_to_mat(indices, n)
+		calc_rows, calc_cols = tri.triu_idx_to_mat(indices, n)
 
 	else:
 		rows, cols = np.tril_indices(n, k=-1)
 
-		calc_indices = pw.mat_idx_to_tril(rows, cols, n)
+		calc_indices = tri.mat_idx_to_tril(rows, cols, n)
 
-		calc_rows, calc_cols = pw.tril_idx_to_mat(indices, n)
+		calc_rows, calc_cols = tri.tril_idx_to_mat(indices, n)
 
 	assert np.array_equal(calc_indices, indices)
 

@@ -1,4 +1,4 @@
-"""Setuptools installation script for pwtools package."""
+"""Setuptools installation script for triarray package."""
 
 from setuptools import setup, find_packages
 from distutils.util import convert_path
@@ -6,17 +6,16 @@ from distutils.util import convert_path
 
 # Get package version without importing it
 version_ns = dict()
-with open(convert_path('pwtools/version.py')) as fobj:
+with open(convert_path('triarray/version.py')) as fobj:
 	exec(fobj.read(), version_ns)
 version = version_ns['__version__']
 
 
 setup(
-	name='pwtools',
+	name='triarray',
 	version=version,
 	description=(
-		'Tools for working with pairwise distance/similarity matrices in '
-		'non-redundant format.',
+		'Tools for working with symmetric matrices in non-redundant format.',
 	),
 	author='Jared Lumpe',
 	license='MIT',
