@@ -14,3 +14,4 @@ from .convert import (
 	matrix_to_tri,
 )
 from .io import write_tri_file, read_tri_file_rows, read_tri_file
+from .matrix import TriMatrix
