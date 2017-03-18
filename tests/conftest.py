@@ -32,8 +32,14 @@ def indices(n, dtype):
 	return np.arange(size, dtype=dtype)
 
 
+@pytest.fixture(params=[0, 1])
+def diag_val(request):
+	"""Diagonal value of matrix."""
+	return request.param
+
+
 @pytest.fixture()
-def index_matrix(n, indices, upper):
+def index_matrix(n, indices, upper, diag_val):
 	"""Full 2D test matrix containing indices in upper/lower triangle."""
 
 	matrix = np.zeros((n, n), dtype=indices.dtype)
@@ -46,6 +52,8 @@ def index_matrix(n, indices, upper):
 
 	matrix[rows, cols] = indices
 	matrix[cols, rows] = indices
+
+	np.fill_diagonal(matrix, diag_val)
 
 	assert np.array_equal(matrix, matrix.T)
 

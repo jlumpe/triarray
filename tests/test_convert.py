@@ -6,29 +6,16 @@ import numpy as np
 import pwtools as pw
 
 
-def test_array_conversion(indices, index_matrix, upper):
+def test_array_conversion(indices, index_matrix, upper, diag_val):
 	"""Test conversion between matrix and flattened triangle arrays."""
 
-	mat_vals = pw.tri_to_matrix(indices, upper=upper)
+	mat_vals = pw.tri_to_matrix(indices, upper=upper, diag=diag_val)
 	assert np.array_equal(mat_vals, index_matrix)
 	assert mat_vals.dtype == indices.dtype
 
 	tri_vals = pw.matrix_to_tri(index_matrix, upper=upper)
 	assert np.array_equal(indices, tri_vals)
 	assert tri_vals.dtype == index_matrix.dtype
-
-
-@pytest.mark.parametrize('diag', [0, 1])
-def test_matrix_diag(upper, diag):
-	"""Test the diag argument of tri_to_matrix()."""
-
-	n = 10
-
-	tri_vals = np.zeros(pw.tri_n(n - 1))
-
-	matrix = pw.tri_to_matrix(tri_vals, diag=diag, upper=upper)
-
-	assert np.all(np.diagonal(matrix) == diag)
 
 
 def test_index_conversion_scalar(n, index_matrix, upper):
