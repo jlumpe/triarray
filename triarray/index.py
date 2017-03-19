@@ -19,7 +19,7 @@ def mat_idx_to_tril_fast(row, col, n):
 	:param int col: Matrix column index. Must be less than row.
 	:param int n: Matrix size.
 	:returns: Linear index of position in lower triangle.
-	:rtype int:
+	:rtype: int
 	"""
 	return tri_n(row - 1) + col
 
@@ -37,7 +37,8 @@ def mat_idx_to_tril(row, col, n):
 	:param int col: Matrix column index. Must not be equal to row.
 	:param int n: Matrix size.
 	:returns: Linear index of position in lower triangle.
-	:rtype int:
+	:rtype: int
+	:raises ValueError: If ``row == col``.
 	"""
 	if col == row:
 		raise ValueError('Cannot get index along diagonal')
@@ -61,7 +62,7 @@ def mat_idx_to_triu_fast(row, col, n):
 	:param int col: Matrix column index. Must be greater than row.
 	:param int n: Matrix size.
 	:returns: Linear index of position in upper triangle.
-	:rtype int:
+	:rtype: int
 	"""
 	# Messy but fast implementation
 	return (2 * n - row - 3) * row // 2 + col - 1
@@ -80,7 +81,8 @@ def mat_idx_to_triu(row, col, n):
 	:param int col: Matrix column index. Must not be equal to row.
 	:param int n: Matrix size.
 	:returns: Linear index of position in upper triangle.
-	:rtype int:
+	:rtype: int
+	:raises ValueError: If ``row == col``.
 	"""
 	if col == row:
 		raise ValueError('Cannot get index along diagonal')
@@ -93,12 +95,14 @@ def mat_idx_to_triu(row, col, n):
 
 @nb.jit(nopython=True)
 def triu_idx_to_mat(i, n):
-	"""Convert linear index of upper triangle to two-dimensional index.
+	"""triu_idx_to_mat(i, n)
+
+	Convert linear index of upper triangle to two-dimensional index.
 
 	:param int i: Linear index of element in upper triangle.
 	:param int n: Size of matrix.
 	:returns: 2-tuple of ``(row, col)`` indices.
-	:rtype: tuple
+	:rtype: tuple(int, int)
 	"""
 	tn = tri_n(n - 1)
 	root, rem = tri_root_rem(tn - i - 1)
@@ -107,12 +111,14 @@ def triu_idx_to_mat(i, n):
 
 @nb.jit(nopython=True)
 def tril_idx_to_mat(i, n):
-	"""Convert linear index of lower triangle to two-dimensional index.
+	"""tril_idx_to_mat(i, n)
+
+	Convert linear index of lower triangle to two-dimensional index.
 
 	:param int i: Linear index of element in lower triangle.
 	:param int n: Size of matrix.
 	:returns: 2-tuple of ``(row, col)`` indices.
-	:rtype: tuple
+	:rtype: tuple(int, int)
 	"""
 	root, rem = tri_root_rem(i)
 	return root + 1, rem

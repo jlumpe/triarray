@@ -75,7 +75,7 @@ def tri_root_rem(t):
 
 	:param t: Scalar or array of nonnegative integers.
 	:returns: (n, r) tuple of arrays the same shape as ``t``.
-	:rtype: tuple
+	:rtype: tuple(int, int)
 	"""
 	n = tri_root_trunc(t)
 	return n, t - tri_n(n)

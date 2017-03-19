@@ -528,7 +528,7 @@ class TriMatrix:
 
 		Yielded arrays are writable slices of :attr:`array`.
 
-		:returns: Generator yielding class:`numpy.ndarray`.
+		:returns: Generator yielding :class:`numpy.ndarray`.
 		"""
 
 		start = 0
