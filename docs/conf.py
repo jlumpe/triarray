@@ -160,4 +160,20 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'https://docs.python.org/': None,
+    'http://docs.scipy.org/doc/numpy/': None,
+    'http://docs.scipy.org/doc/scipy/reference': None,
+}
+
+
+
+
+# -- Custom - added after sphinx-quickstart -------------------------------
+
+
+# Autodoc config
+autodoc_default_flags = [
+    'members',
+    'no-undoc-members',
+]
