@@ -7,11 +7,11 @@ Python package for working with symmetric matrices in non-redundant format.
 
 The `triarray` package contains tools for working with large symmetric matrices while only storing the elements in the upper or lower triangle, thus halving memory requirements.
 
-When storing symmetric matrices stored in standard array format about half of the elements are redundant, meaning you are using twice as much memory or disk space as you need to. This is especially common in scientific applications when working with large distance or similarity matrices.
+When storing symmetric matrices in standard array format about half of the elements are redundant, meaning you are using twice as much memory or disk space as you need to. This is especially common in scientific applications when working with large distance or similarity matrices.
 
-Space can be saved by storing only the lower or upper triangle of the array, but standard operations like getting an element by row and column become awkward. ``triarray`` provides tools for working with data in this format.
+Space can be saved by storing only the lower or upper triangle of the array, but standard operations like getting an element by row and column become awkward. `triarray` provides tools for working with data in this format.
 
-``triarray`` uses [Numba](http://numba.pydata.org/)'s just-in-time compilation to generate high-performance C code that works with any data type and is easily extendable (including within a Jupyter notebook).
+`triarray` uses [Numba](http://numba.pydata.org/)'s just-in-time compilation to generate high-performance C code that works with any data type and is easily extendable (including within a Jupyter notebook).
 
 
 ### Example
