@@ -5,7 +5,10 @@ from enum import Enum
 
 import numpy as np
 import numba as nb
-
+try:
+	from numba.experimental import jitclass
+except ImportError:
+	from numba import jitclass
 
 from .math import tri_n, tri_root
 
@@ -255,7 +258,7 @@ def _make_jitclass_for_type(base, nbtype):
 		('diag_val', nbtype)
 	]
 
-	return nb.jitclass(spec)(base)
+	return jitclass(spec)(base)
 
 
 # Jitclasses of NbTriLMatrixBase for each supported array data type
