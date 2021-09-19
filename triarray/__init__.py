@@ -1,5 +1,7 @@
 """Utilities for dealing with pairwise distance/similarity matrices."""
 
+__version__ = '0.2.1'
+
 from .math import tri_n, tri_root, tri_root_strict, tri_root_trunc, tri_root_rem
 from .index import (
 	mat_idx_to_tril,
